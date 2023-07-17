@@ -119,6 +119,8 @@ export let marchingCubeGPU = async (
 ): Promise<Float32Array> => {
     const RESULT_BUFFER_SIZE = pointsArrayBuffer.length * 3 * 12;
     const POINTS_BUFFER_SIZE = 4 * pointsArrayBuffer.length;
+    console.log(RESULT_BUFFER_SIZE)
+    console.log(POINTS_BUFFER_SIZE)
     var pointsBuffer = device.createBuffer({
         size: POINTS_BUFFER_SIZE,
         usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,

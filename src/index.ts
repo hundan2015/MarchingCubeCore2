@@ -7,32 +7,10 @@ import * as POINT from "./include/Points.js";
  */
 let points: POINT.Point[] = POINT.getTestPoints(50);
 let pointsArray: Float32Array = POINTGPU.createPointsArrayBuffer(points);
-
-export let loadPoints = (
-    file: File,
-    length: number,
-    width: number,
-    height: number
-): POINT.Point[] => {
-    var reader: FileReader = new FileReader();
-    reader.readAsArrayBuffer(file);
-    var buffer = reader.result;
-    var arrayBufferView = new Uint8Array(buffer as ArrayBuffer);
-    let result: POINT.Point[] = [];
-    for (let i = 0; i < length; ++i) {
-        for (let j = 0; j < width; ++j) {
-            for (let k = 0; k < height; ++k) {
-                let id = i + j * length + k * width * length;
-                let pointTemp: POINT.Point = {
-                    position: new THREE.Vector3(i, j, k),
-                    value: arrayBufferView[id],
-                };
-                result.push(pointTemp);
-            }
-        }
-    }
-    return result;
-};
+// Define global paramenters.
+let length = 50;
+let width = 50;
+let height = 50;
 
 export let getNewModel = (
     isoLevel: number,
@@ -78,6 +56,40 @@ export let getNewModel = (
 };
 
 /**
+ * Init html elements.
+ */
+let isoSlider = document.getElementById("myRange") as HTMLInputElement;
+console.dir(isoSlider);
+isoSlider.onchange = () => {
+    let value = isoSlider.value;
+    getNewModel(Number(value), 1, length, width, height);
+};
+
+let fileInput = document.getElementById("inputFile") as HTMLInputElement;
+fileInput.addEventListener("change", () => {
+    let tempFile = fileInput.files[0];
+    console.log(tempFile);
+    // TODO: load points.
+    let loadFile = (): Promise<ArrayBuffer> => {
+        return new Promise((resolve) => {
+            let reader = new FileReader();
+            reader.onload = () => {
+                resolve(reader.result as ArrayBuffer);
+            };
+            reader.readAsArrayBuffer(tempFile);
+        });
+    };
+    loadFile().then((tempFile) => {
+        points = POINT.loadPoints(tempFile, 512, 512, 41);
+        length = 512;
+        width = 512;
+        height = 41;
+        pointsArray = POINTGPU.createPointsArrayBuffer(points);
+        getNewModel(Number(isoSlider.value), 1, length, width, height);
+    });
+});
+
+/**
  * Init Three.js scene.
  */
 
@@ -93,7 +105,7 @@ const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 camera.position.z = 70;
-
+// load default model.
 getNewModel(30, 10, 50, 50, 50);
 function animate() {
     requestAnimationFrame(animate);

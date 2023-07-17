@@ -35,3 +35,26 @@ export let getTestPoints = (size: number): Point[] => {
     }
     return result;
 };
+
+export let loadPoints = (
+    buffer:ArrayBuffer,
+    length: number,
+    width: number,
+    height: number
+): Point[] => {
+    var arrayBufferView = new Uint16Array(buffer as ArrayBuffer);
+    let result: Point[] = [];
+    for (let i = 0; i < length; ++i) {
+        for (let j = 0; j < width; ++j) {
+            for (let k = 0; k < height; ++k) {
+                let id = i + j * length + k * width * length;
+                let pointTemp: Point = {
+                    position: new THREE.Vector3(i, j, k),
+                    value: arrayBufferView[id],
+                };
+                result.push(pointTemp);
+            }
+        }
+    }
+    return result;
+};
