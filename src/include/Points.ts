@@ -1,4 +1,4 @@
-import * as THREE from "three";
+import * as THREE from "../../node_modules/three/build/three.module.js";
 export interface Point {
     position: THREE.Vector3; // 12B
     value: number; // 4B
@@ -10,7 +10,7 @@ export interface Face {
     third: THREE.Vector3;
 }
 
-export let getTestPoints = (size: number, radius: number): Point[] => {
+export let getTestPoints = (size: number): Point[] => {
     let result: Point[] = [];
     //Make Points;
     for (let i = 0; i < size; ++i) {

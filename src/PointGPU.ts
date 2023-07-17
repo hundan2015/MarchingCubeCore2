@@ -1,6 +1,6 @@
-import { Point } from "./include/Points";
-import { edgeTable, triTable } from "./include/table";
-import { computeShader } from "./include/ComputeShader";
+import { Point } from "./include/Points.js";
+import { edgeTable, triTable } from "./include/table.js";
+import { computeShader } from "./include/ComputeShader.js";
 /**
  * Init adapter.
  */
@@ -98,6 +98,18 @@ let widthBuffer = device.createBuffer({
     usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
 });
 
+export let createPointsArrayBuffer = (points: Point[]): Float32Array => {
+    let pointTableData = new ArrayBuffer(16 * points.length);
+    let pointTableDataview = new DataView(pointTableData);
+    for (var i = 0; i < points.length; i++) {
+        pointTableDataview.setFloat32(i * 16, points[i].position.x, true);
+        pointTableDataview.setFloat32(i * 16 + 4, points[i].position.y, true);
+        pointTableDataview.setFloat32(i * 16 + 8, points[i].position.z, true);
+        pointTableDataview.setFloat32(i * 16 + 12, points[i].value, true);
+    }
+    return new Float32Array(pointTableData);
+}
+
 export let marchingCubeGPU = async (
     pointsArrayBuffer: Float32Array,
     length: number,
@@ -167,7 +179,6 @@ export let marchingCubeGPU = async (
         ],
     });
 
-
     var commandEncoder = device.createCommandEncoder();
     var passEncoder = commandEncoder.beginComputePass();
     passEncoder.setPipeline(pipeline);
@@ -188,5 +199,10 @@ export let marchingCubeGPU = async (
     var data = copyArrayBuffer.slice(0, RESULT_BUFFER_SIZE);
     stagingBuffer.unmap();
     let temp = new Float32Array(data);
+    for (var i = 0; i < temp.length; i += 3) {
+        temp[i] -= length / 2;
+        temp[i + 1] -= width / 2;
+        temp[i + 2] -= height / 2;
+    }
     return temp;
 };

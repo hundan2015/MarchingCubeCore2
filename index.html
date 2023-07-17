@@ -3,23 +3,7 @@
     <head>
         <title>A super mother fucker</title>
     </head>
-    <script type="module">
-        import { makeNewShit,loadPoints } from './index.js';
-        let glo = (isoLevel) => {
-            console.log("Onchange");
-            makeNewShit(isoLevel);
-        }
-        //document.getElementById("myRange").onchange = glo(document.getElementById("myRange").value);
-        document.getElementById("myRange").onchange = () => {
-            console.log("SHabi");
-            glo(document.getElementById("myRange").value);
-        };
-        document.getElementById("inputFile").addEventListener('change',
-            () => {
-                let tempFile =document.getElementById("inputFile").files[0];
-                console.log(tempFile);
-                let points = loadPoints(tempFile,512,512,42);
-            });
+    <script type="module" src="build/index.js">
     </script>
     <h1>Super mother fucker</h1>
     <input type="range" id="myRange" min="0" max="100" step="1"'>
