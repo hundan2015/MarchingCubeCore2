@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+        "target": "es2022",
+        "module": "es2022",
+        "types": [
+            "@webgpu/types",
+            "@types/three"
+        ],
+        "moduleDetection": "auto",
+        "outDir": "build"
+    },
+    "include": [
+        "src/**/*.ts"
+    ]
+}
