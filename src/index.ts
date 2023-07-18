@@ -24,10 +24,10 @@ export let getNewModel = (
     let i = 0;
     for (let i = 0; i < pointsArray.length; i += pointUnit * slice) {
         var tempPromise = POINTGPU.marchingCubeGPU(
-            pointsArray.slice(i, i + pointUnit * (slice + 1)),
+            pointsArray.slice(i, i + pointUnit * (slice + 2)),
             length,
             width,
-            slice + 1,
+            slice,
             isoLevel
         );
         promises.push(tempPromise);
@@ -35,23 +35,50 @@ export let getNewModel = (
 
     Promise.all(promises).then((verticess) => {
         // Remove everything in the scene.
-        while (scene.children.length > 0) {
+        /* while (scene.children.length > 0) {
             const object = scene.children[0];
             scene.remove(object);
+        } */
+        var meshes = [];
+        scene.traverse(function (object) {
+            if (object instanceof THREE.Mesh) {
+                meshes.push(object);
+            }
+        });
+        for (var i = 0; i < meshes.length; i++) {
+            var mesh = meshes[i];
+            scene.remove(mesh);
         }
+        for (var i = 0; i < meshes.length; i++) {
+            var mesh = meshes[i];
+            mesh.geometry.dispose();
+            mesh.material.dispose();
+        }
+
         // Add Vertices.
+        let totalLength = 0;
         for (var vertices of verticess) {
-            var geometry = new THREE.BufferGeometry();
-            geometry.setAttribute(
-                "position",
-                new THREE.BufferAttribute(vertices, 3)
-            );
-            var material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-            material.wireframe = true;
-            var cube = new THREE.Mesh(geometry, material);
-            scene.add(cube);
-            vertices = undefined;
+            totalLength += vertices.length;
         }
+        let finalVertices = new Float32Array(totalLength);
+        let tempLength = 0;
+        for (var vertices of verticess) {
+            finalVertices.set(vertices, tempLength);
+            tempLength += vertices.length;
+        }
+        var geometry = new THREE.BufferGeometry();
+        geometry.setAttribute(
+            "position",
+            new THREE.BufferAttribute(finalVertices, 3)
+        );
+        var material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+        material.wireframe = true;
+        //var material = new THREE.MeshDepthMaterial();
+        var cube = new THREE.Mesh(geometry, material);
+        cube.rotation.y = 180;
+        scene.add(cube);
+        vertices = undefined;
+        console.log("Add end.");
     });
 };
 
@@ -70,7 +97,8 @@ fileInput.addEventListener("change", () => {
     let tempFile = fileInput.files[0];
     console.log(tempFile);
     // TODO: load points.
-    let loadFile = (): Promise<ArrayBuffer> => {
+    let start = new Date();
+    function loadFile(): Promise<ArrayBuffer> {
         return new Promise((resolve) => {
             let reader = new FileReader();
             reader.onload = () => {
@@ -78,7 +106,7 @@ fileInput.addEventListener("change", () => {
             };
             reader.readAsArrayBuffer(tempFile);
         });
-    };
+    }
     loadFile().then((tempFile) => {
         points = POINT.loadPoints(tempFile, 512, 512, 41);
         length = 512;
@@ -86,6 +114,8 @@ fileInput.addEventListener("change", () => {
         height = 41;
         pointsArray = POINTGPU.createPointsArrayBuffer(points);
         getNewModel(Number(isoSlider.value), 1, length, width, height);
+        let end = new Date();
+        console.log(end.getTime() - start.getTime());
     });
 });
 
@@ -104,7 +134,7 @@ console.log("Hi");
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
-camera.position.z = 70;
+camera.position.z = 500;
 // load default model.
 getNewModel(30, 10, 50, 50, 50);
 function animate() {

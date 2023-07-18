@@ -43,10 +43,11 @@ export let loadPoints = (
     height: number
 ): Point[] => {
     var arrayBufferView = new Uint16Array(buffer as ArrayBuffer);
+    console.log(arrayBufferView);
     let result: Point[] = [];
-    for (let i = 0; i < length; ++i) {
+    for (let k = 0; k < height; ++k) {
         for (let j = 0; j < width; ++j) {
-            for (let k = 0; k < height; ++k) {
+            for (let i = 0; i < length; ++i) {
                 let id = i + j * length + k * width * length;
                 let pointTemp: Point = {
                     position: new THREE.Vector3(i, j, k),

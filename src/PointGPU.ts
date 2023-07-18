@@ -108,7 +108,7 @@ export let createPointsArrayBuffer = (points: Point[]): Float32Array => {
         pointTableDataview.setFloat32(i * 16 + 12, points[i].value, true);
     }
     return new Float32Array(pointTableData);
-}
+};
 
 export let marchingCubeGPU = async (
     pointsArrayBuffer: Float32Array,
@@ -119,8 +119,8 @@ export let marchingCubeGPU = async (
 ): Promise<Float32Array> => {
     const RESULT_BUFFER_SIZE = pointsArrayBuffer.length * 3 * 12;
     const POINTS_BUFFER_SIZE = 4 * pointsArrayBuffer.length;
-    console.log(RESULT_BUFFER_SIZE)
-    console.log(POINTS_BUFFER_SIZE)
+    console.log(RESULT_BUFFER_SIZE);
+    console.log(POINTS_BUFFER_SIZE);
     var pointsBuffer = device.createBuffer({
         size: POINTS_BUFFER_SIZE,
         usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
@@ -201,6 +201,21 @@ export let marchingCubeGPU = async (
     var data = copyArrayBuffer.slice(0, RESULT_BUFFER_SIZE);
     stagingBuffer.unmap();
     let temp = new Float32Array(data);
+    var count = 0;
+    let temp2 = new Float32Array(temp.length);
+    for (var i = 0; i < temp.length; i += 9) {
+        let isGood = true;
+        for (var j = 0; j < 9; j++) {
+            temp2[count + j] = temp[i + j];
+            if (temp[i + j] == 0) {
+                isGood = false;
+                break;
+            }
+        }
+        if (isGood) count += 9;
+    }
+    temp = new Float32Array(temp2.slice(0, count));
+    console.log(temp);
     for (var i = 0; i < temp.length; i += 3) {
         temp[i] -= length / 2;
         temp[i + 1] -= width / 2;
