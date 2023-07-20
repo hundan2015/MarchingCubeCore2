@@ -9,7 +9,10 @@ npm install typescript
 npm install @webgpu/types
 npm install @types/three
 npm install three
+npm install vite
 tsc
+
+npx vite
 ```
 
-Then run the `index.html`.
+Then view the page in the target url.
