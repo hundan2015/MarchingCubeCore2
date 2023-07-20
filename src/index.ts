@@ -85,7 +85,16 @@ export let getNewModel = (
         //len:112.52,height:102.5
         //0.219,2.5
         //cube.scale.z = 11.4;
-        cube.scale.set(0.01, 0.01, 0.114);
+
+        // Set height scale.
+        let heightScaleWidget = document.getElementById(
+            "heightScale"
+        ) as HTMLInputElement;
+        if (heightScaleWidget.value == "") {
+            heightScaleWidget.value = "11.4";
+        }
+
+        cube.scale.set(0.01, 0.01, 0.01 * Number(heightScaleWidget.value));
         cube.rotateX(Math.PI / 2);
         cube.rotateZ(-Math.PI / 2);
         cube.position.set(0, 1, 0);
@@ -123,6 +132,28 @@ fileInput.addEventListener("change", () => {
     console.log(tempFile);
     let start = new Date();
     function loadFile(): Promise<ArrayBuffer> {
+        let widthWidget = document.getElementById("width") as HTMLInputElement;
+        let lengthWidget = document.getElementById(
+            "length"
+        ) as HTMLInputElement;
+        let heightWidget = document.getElementById(
+            "height"
+        ) as HTMLInputElement;
+        let heightScaleWidget = document.getElementById(
+            "heightScale"
+        ) as HTMLInputElement;
+        if (
+            widthWidget.value == "" ||
+            lengthWidget.value == "" ||
+            heightWidget.value == ""
+        ) {
+            fileInput.value = "";
+            alert("Please input the length, width and height.");
+            return;
+        }
+        if(heightScaleWidget.value == ""){
+            heightScaleWidget.value = "11.4";
+        }
         return new Promise((resolve) => {
             let reader = new FileReader();
             reader.onload = () => {
@@ -132,14 +163,33 @@ fileInput.addEventListener("change", () => {
         });
     }
     loadFile().then((tempFile) => {
-        points = POINT.loadPoints(tempFile, 512, 512, 41);
-        length = 512;
-        width = 512;
-        height = 41;
+        //Setup points.
+        let widthWidget = document.getElementById("width") as HTMLInputElement;
+        let lengthWidget = document.getElementById(
+            "length"
+        ) as HTMLInputElement;
+        let heightWidget = document.getElementById(
+            "height"
+        ) as HTMLInputElement;
+        let tempInfo = POINT.loadPoints(
+            tempFile,
+            Number(lengthWidget.value),
+            Number(widthWidget.value),
+            Number(heightWidget.value)
+        );
+        //Setup isoSlider.
+        let isoSlider = document.getElementById("myRange") as HTMLInputElement;
+        isoSlider.max = String(tempInfo.max);
+        isoSlider.min = String(tempInfo.min);
+        isoSlider.step = String((tempInfo.max - tempInfo.min) / 100);
+        points = tempInfo.points;
+        length = Number(lengthWidget.value);
+        width = Number(widthWidget.value);
+        height = Number(heightWidget.value);
         pointsArray = POINTGPU.createPointsArrayBuffer(points);
         getNewModel(Number(isoSlider.value), 1, length, width, height);
         let end = new Date();
-        console.log(end.getTime() - start.getTime());
+        console.log("Total time:" + String(end.getTime() - start.getTime()));
     });
 });
 

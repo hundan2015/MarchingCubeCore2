@@ -35,16 +35,25 @@ export let getTestPoints = (size: number): Point[] => {
     }
     return result;
 };
-
+export interface PointsInfo {
+    length: number;
+    width: number;
+    height: number;
+    points: Point[];
+    min: number;
+    max: number;
+}
 export let loadPoints = (
-    buffer:ArrayBuffer,
+    buffer: ArrayBuffer,
     length: number,
     width: number,
     height: number
-): Point[] => {
+): PointsInfo => {
     var arrayBufferView = new Uint16Array(buffer as ArrayBuffer);
     console.log(arrayBufferView);
     let result: Point[] = [];
+    let max = -1;
+    let min = 65536;
     for (let k = 0; k < height; ++k) {
         for (let j = 0; j < width; ++j) {
             for (let i = 0; i < length; ++i) {
@@ -53,9 +62,18 @@ export let loadPoints = (
                     position: new THREE.Vector3(i, j, k),
                     value: arrayBufferView[id],
                 };
+                max = Math.max(max, pointTemp.value);
+                min = Math.min(min, pointTemp.value);
                 result.push(pointTemp);
             }
         }
     }
-    return result;
+    return {
+        max: max,
+        min: min,
+        points: result,
+        length: length,
+        width: width,
+        height: height
+    };
 };
