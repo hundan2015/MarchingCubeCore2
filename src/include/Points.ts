@@ -1,4 +1,4 @@
-import * as THREE from "../../node_modules/three/build/three.module.js";
+import * as THREE from "three";
 export interface Point {
     position: THREE.Vector3; // 12B
     value: number; // 4B

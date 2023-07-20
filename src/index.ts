@@ -1,6 +1,7 @@
-import * as THREE from "../node_modules/three/build/three.module.js";
+import * as THREE from "three";
 import * as POINTGPU from "./PointGPU.js";
 import * as POINT from "./include/Points.js";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 
 /**
  * Define basic things.
@@ -41,10 +42,12 @@ export let getNewModel = (
         } */
         var meshes = [];
         scene.traverse(function (object) {
+            console.log(object);
             if (object instanceof THREE.Mesh) {
                 meshes.push(object);
             }
         });
+        console.log(meshes);
         for (var i = 0; i < meshes.length; i++) {
             var mesh = meshes[i];
             scene.remove(mesh);
@@ -71,14 +74,36 @@ export let getNewModel = (
             "position",
             new THREE.BufferAttribute(finalVertices, 3)
         );
-        var material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-        material.wireframe = true;
+        //var material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+        //material.wireframe = true;
         //var material = new THREE.MeshDepthMaterial();
+        const material = new THREE.MeshPhongMaterial({
+            side: THREE.DoubleSide,
+            flatShading: true,
+        });
         var cube = new THREE.Mesh(geometry, material);
-        cube.rotation.y = 180;
+        //len:112.52,height:102.5
+        //0.219,2.5
+        //cube.scale.z = 11.4;
+        cube.scale.set(0.01, 0.01, 0.114);
+        cube.rotateX(Math.PI / 2);
+        cube.rotateZ(-Math.PI / 2);
+        cube.position.set(0, 1, 0);
+
+        cube.castShadow = true;
+        cube.receiveShadow = true;
         scene.add(cube);
         vertices = undefined;
         console.log("Add end.");
+        /* {
+            const geometry = new THREE.BoxGeometry(1, 1, 1);
+            //const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+            const material = new THREE.MeshLambertMaterial({
+                side: THREE.DoubleSide,
+            });
+            const cube = new THREE.Mesh(geometry, material);
+            scene.add(cube);
+        } */
     });
 };
 
@@ -96,7 +121,6 @@ let fileInput = document.getElementById("inputFile") as HTMLInputElement;
 fileInput.addEventListener("change", () => {
     let tempFile = fileInput.files[0];
     console.log(tempFile);
-    // TODO: load points.
     let start = new Date();
     function loadFile(): Promise<ArrayBuffer> {
         return new Promise((resolve) => {
@@ -130,13 +154,31 @@ const camera = new THREE.PerspectiveCamera(
     0.1,
     1000
 );
+
 console.log("Hi");
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
-camera.position.z = 500;
+
+let cameraControls = new OrbitControls(camera, renderer.domElement);
+cameraControls.addEventListener("change", () => {
+    renderer.render(scene, camera);
+});
+camera.position.z = 10;
+
 // load default model.
 getNewModel(30, 10, 50, 50, 50);
+
+let ambientLight = new THREE.AmbientLight(0x7c7c7c, 1);
+
+let light = new THREE.PointLight(0xffffff, 3);
+light.castShadow = true;
+
+light.position.set(5, 5, 5);
+light.visible = true;
+
+scene.add(ambientLight);
+scene.add(light);
 function animate() {
     requestAnimationFrame(animate);
     renderer.render(scene, camera);
