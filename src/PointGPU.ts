@@ -98,6 +98,10 @@ let widthBuffer = device.createBuffer({
     usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
 });
 
+//Init two table buffer.
+device.queue.writeBuffer(triTableBuffer, 0, triTable);
+device.queue.writeBuffer(edgeTableBuffer, 0, edgeTable);
+
 export let createPointsArrayBuffer = (points: Point[]): Float32Array => {
     let pointTableData = new ArrayBuffer(16 * points.length);
     let pointTableDataview = new DataView(pointTableData);
@@ -134,8 +138,6 @@ export let marchingCubeGPU = async (
         usage: GPUBufferUsage.MAP_READ | GPUBufferUsage.COPY_DST,
     });
 
-    device.queue.writeBuffer(triTableBuffer, 0, triTable);
-    device.queue.writeBuffer(edgeTableBuffer, 0, edgeTable);
     device.queue.writeBuffer(isoBuffer, 0, new Float32Array([isoLevel]));
     device.queue.writeBuffer(lengthBuffer, 0, new Uint32Array([length]));
     device.queue.writeBuffer(widthBuffer, 0, new Uint32Array([width]));
