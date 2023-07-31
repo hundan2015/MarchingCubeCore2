@@ -209,6 +209,8 @@ console.log("Hi");
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth * 0.9, window.innerHeight * 0.9);
 document.getElementById("canvas-container").appendChild(renderer.domElement);
+renderer.domElement.style.marginLeft = "auto";
+renderer.domElement.style.marginRight = "auto";
 
 let cameraControls = new OrbitControls(camera, renderer.domElement);
 cameraControls.addEventListener("change", () => {

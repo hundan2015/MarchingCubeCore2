@@ -28,7 +28,7 @@
 
     <body>
         <div id="container">
-            <button id="show-floating-btn">File info</button>
+            
             <div id="floating-window">
                 <div class="col-1">
                     <label for="width"> width</label
@@ -47,9 +47,16 @@
                     <button id="close-floating-btn">Close</button>
                 </div>
             </div>
-            <h1>Super mother fucker</h1>
+            <h1>Web CT-scan viewer</h1>
 
-            <div id="canvas-container" style="position: relative;text-align: center;">
+            <div
+                id="canvas-container"
+                style="
+                    position: relative;
+                    text-align: center;
+                    background-color: black;
+                "
+            >
                 <div
                     id="control-panal"
                     style="position: absolute; top: 3%; left: 3%"
@@ -62,6 +69,7 @@
                         max="3000"
                         step="100"
                     />
+                    <button id="show-floating-btn">File info</button>
                 </div>
             </div>
         </div>
