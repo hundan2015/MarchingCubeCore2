@@ -151,7 +151,7 @@ fileInput.addEventListener("change", () => {
             alert("Please input the length, width and height.");
             return;
         }
-        if(heightScaleWidget.value == ""){
+        if (heightScaleWidget.value == "") {
             heightScaleWidget.value = "11.4";
         }
         return new Promise((resolve) => {
@@ -207,8 +207,8 @@ const camera = new THREE.PerspectiveCamera(
 
 console.log("Hi");
 const renderer = new THREE.WebGLRenderer();
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
+renderer.setSize(window.innerWidth * 0.9, window.innerHeight * 0.9);
+document.getElementById("canvas-container").appendChild(renderer.domElement);
 
 let cameraControls = new OrbitControls(camera, renderer.domElement);
 cameraControls.addEventListener("change", () => {
@@ -233,4 +233,18 @@ function animate() {
     requestAnimationFrame(animate);
     renderer.render(scene, camera);
 }
+
+addEventListener("resize", () => {
+    // 更新修改相机比例
+    camera.aspect = window.innerWidth / window.innerHeight;
+    // 更新摄像机的投影矩阵
+    camera.updateProjectionMatrix();
+    // 更新画布大小
+    renderer.setSize(
+        window.innerWidth * 0.9, // 宽度
+        window.innerHeight * 0.9 // 高度
+    );
+    // 更新画布像素比
+    renderer.setPixelRatio(window.devicePixelRatio);
+});
 animate();

@@ -2,16 +2,62 @@
 <html>
     <head>
         <title>A super mother fucker</title>
+        <link
+            rel="stylesheet"
+            href="node_modules/bootstrap/dist/css/bootstrap.css"
+        />
+        <script src="node_modules/bootstrap/dist/js/bootstrap.js"></script>
+        <style>
+            /* 悬浮窗口的样式 */
+            #floating-window {
+                display: none;
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background-color: #f1f1f1;
+                padding: 20px;
+                border: 1px solid #ccc;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+                z-index: 9999;
+            }
+        </style>
     </head>
-    <script type="module" src="build/index.js">
-    </script>
-    <h1>Super mother fucker</h1>
-    <input type="range" id="myRange" min="0" max="3000" step="100">
-    <label for="width"> width</label><input type="number" id="width">
-    <label for="length"> length</label><input type="number" id="length">
-    <label for="height"> height</label><input type="number" id="height">
-    <label for="heightScale"> height scale</label><input type="number" id="heightScale">
 
-    <input type="file" id="inputFile">
+    <script type="module" src="build/index.js"></script>
+
+    <body>
+        <div id="container">
+            <button id="show-floating-btn">File info</button>
+            <div id="floating-window">
+                <input
+                    type="range"
+                    id="myRange"
+                    min="0"
+                    max="3000"
+                    step="100"
+                />
+                <div class="col-1">
+                    <label for="width"> width</label
+                    ><input type="number" id="width" />
+                    <label for="length"> length</label
+                    ><input type="number" id="length" />
+                    <label for="height"> height</label
+                    ><input type="number" id="height" />
+                    <label for="heightScale"> height scale</label
+                    ><input type="number" id="heightScale" />
+                </div>
+                <div class="col-1">
+                    <input type="file" id="inputFile" />
+                </div>
+                <div class="col-1">
+                    <button id="close-floating-btn">Close</button>
+                </div>
+            </div>
+            <h1>Super mother fucker</h1>
+
+            <div id="canvas-container"></div>
+        </div>
+        <script src="build/ui.js"></script>
     </body>
 </html>
