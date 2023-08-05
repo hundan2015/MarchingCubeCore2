@@ -136,19 +136,19 @@ let getPointBuffer = (
         size: POINTS_BUFFER_SIZE,
         usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
     });
-    var resultsBuffer = device.createBuffer({
+    /* var resultsBuffer = device.createBuffer({
         size: RESULT_BUFFER_SIZE,
         usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
-    });
-    var stagingBuffer = device.createBuffer({
+    }); */
+    /* var stagingBuffer = device.createBuffer({
         size: RESULT_BUFFER_SIZE,
         usage: GPUBufferUsage.MAP_READ | GPUBufferUsage.COPY_DST,
-    });
+    }); */
     device.queue.writeBuffer(pointsBuffer, 0, pointsArrayBuffer);
     let result: BufferPair = {
         pointsBuffer: pointsBuffer,
-        resultBuffer: resultsBuffer,
-        stagingBuffer: stagingBuffer,
+        resultBuffer: undefined,
+        stagingBuffer: undefined,
     };
     bufferContainer.set(id, result);
     return result;
@@ -173,7 +173,10 @@ export let marchingCubeGPU = async (
         console.log(id);
     }
     var pointsBuffer = buffers.pointsBuffer;
-    var resultsBuffer = buffers.resultBuffer;
+    var resultsBuffer = device.createBuffer({
+        size: RESULT_BUFFER_SIZE,
+        usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
+    });
     var stagingBuffer = device.createBuffer({
         size: RESULT_BUFFER_SIZE,
         usage: GPUBufferUsage.MAP_READ | GPUBufferUsage.COPY_DST,
@@ -242,9 +245,9 @@ export let marchingCubeGPU = async (
     var copyArrayBuffer = stagingBuffer.getMappedRange(0, RESULT_BUFFER_SIZE);
     var data = copyArrayBuffer.slice(0, RESULT_BUFFER_SIZE);
     stagingBuffer.unmap();
-    let temp = new Float32Array(data);
+    var temp = new Float32Array(data);
     var count = 0;
-    let temp2 = new Float32Array(temp.length);
+    var temp2 = new Float32Array(temp.length);
     for (var i = 0; i < temp.length; i += 9) {
         let isGood = true;
         for (var j = 0; j < 9; j++) {

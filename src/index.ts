@@ -66,6 +66,7 @@ export let getNewModel = (
             totalLength += vertices.length;
         }
         let finalVertices = new Float32Array(totalLength);
+        console.log("Vertices length:" + totalLength.toString());
         let tempLength = 0;
         for (var vertices of verticess) {
             finalVertices.set(vertices, tempLength);
@@ -83,6 +84,7 @@ export let getNewModel = (
             side: THREE.DoubleSide,
             flatShading: true,
         });
+
         var cube = new THREE.Mesh(geometry, material);
         //len:112.52,height:102.5
         //0.219,2.5
