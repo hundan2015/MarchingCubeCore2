@@ -20,6 +20,7 @@ export let getNewModel = (
     width: number,
     height: number
 ) => {
+    let start = new Date();
     let promises = [];
     let pointUnit = length * width * 4;
     let i = 0;
@@ -29,7 +30,8 @@ export let getNewModel = (
             length,
             width,
             slice,
-            isoLevel
+            isoLevel,
+            i
         );
         promises.push(tempPromise);
     }
@@ -104,6 +106,8 @@ export let getNewModel = (
         scene.add(cube);
         vertices = undefined;
         console.log("Add end.");
+        let end = new Date();
+        console.log("Total time:" + String(end.getTime() - start.getTime()));
         /* {
             const geometry = new THREE.BoxGeometry(1, 1, 1);
             //const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
@@ -130,7 +134,6 @@ let fileInput = document.getElementById("inputFile") as HTMLInputElement;
 fileInput.addEventListener("change", () => {
     let tempFile = fileInput.files[0];
     console.log(tempFile);
-    let start = new Date();
     function loadFile(): Promise<ArrayBuffer> {
         let widthWidget = document.getElementById("width") as HTMLInputElement;
         let lengthWidget = document.getElementById(
@@ -187,9 +190,8 @@ fileInput.addEventListener("change", () => {
         width = Number(widthWidget.value);
         height = Number(heightWidget.value);
         pointsArray = POINTGPU.createPointsArrayBuffer(points);
+        POINTGPU.clearBufferContainer();
         getNewModel(Number(isoSlider.value), 1, length, width, height);
-        let end = new Date();
-        console.log("Total time:" + String(end.getTime() - start.getTime()));
     });
 });
 
@@ -208,7 +210,8 @@ const camera = new THREE.PerspectiveCamera(
 console.log("Hi");
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth * 0.9, window.innerHeight * 0.9);
-document.getElementById("canvas-container").appendChild(renderer.domElement);
+let canvasContainer = document.getElementById("canvas-container");
+canvasContainer.appendChild(renderer.domElement);
 renderer.domElement.style.marginLeft = "auto";
 renderer.domElement.style.marginRight = "auto";
 
@@ -219,7 +222,10 @@ cameraControls.addEventListener("change", () => {
 camera.position.z = 10;
 
 // load default model.
+POINTGPU.clearBufferContainer();
 getNewModel(30, 10, 50, 50, 50);
+
+isoSlider.value = "30";
 
 let ambientLight = new THREE.AmbientLight(0x7c7c7c, 1);
 

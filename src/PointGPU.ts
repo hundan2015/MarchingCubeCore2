@@ -114,17 +114,24 @@ export let createPointsArrayBuffer = (points: Point[]): Float32Array => {
     return new Float32Array(pointTableData);
 };
 
-export let marchingCubeGPU = async (
+interface BufferPair {
+    pointsBuffer: GPUBuffer;
+    resultBuffer: GPUBuffer;
+    stagingBuffer: GPUBuffer;
+}
+let bufferContainer: Map<number, BufferPair> = new Map();
+export let clearBufferContainer = () => {
+    bufferContainer.clear();
+};
+let getPointBuffer = (
     pointsArrayBuffer: Float32Array,
-    length: number,
-    width: number,
-    height: number,
-    isoLevel: number
-): Promise<Float32Array> => {
+    id: number
+): BufferPair => {
+    if (bufferContainer.has(id)) {
+        return bufferContainer.get(id);
+    }
     const RESULT_BUFFER_SIZE = pointsArrayBuffer.length * 3 * 12;
     const POINTS_BUFFER_SIZE = 4 * pointsArrayBuffer.length;
-    console.log(RESULT_BUFFER_SIZE);
-    console.log(POINTS_BUFFER_SIZE);
     var pointsBuffer = device.createBuffer({
         size: POINTS_BUFFER_SIZE,
         usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
@@ -137,12 +144,45 @@ export let marchingCubeGPU = async (
         size: RESULT_BUFFER_SIZE,
         usage: GPUBufferUsage.MAP_READ | GPUBufferUsage.COPY_DST,
     });
+    device.queue.writeBuffer(pointsBuffer, 0, pointsArrayBuffer);
+    let result: BufferPair = {
+        pointsBuffer: pointsBuffer,
+        resultBuffer: resultsBuffer,
+        stagingBuffer: stagingBuffer,
+    };
+    bufferContainer.set(id, result);
+    return result;
+};
 
+export let marchingCubeGPU = async (
+    pointsArrayBuffer: Float32Array,
+    length: number,
+    width: number,
+    height: number,
+    isoLevel: number,
+    id: number = 0
+): Promise<Float32Array> => {
+    console.log("ISO level:" + isoLevel.toString());
+    const RESULT_BUFFER_SIZE = pointsArrayBuffer.length * 3 * 12;
+    const POINTS_BUFFER_SIZE = 4 * pointsArrayBuffer.length;
+    //console.log(RESULT_BUFFER_SIZE);
+    //console.log(POINTS_BUFFER_SIZE);
+
+    var buffers = getPointBuffer(pointsArrayBuffer, id);
+    if (buffers == undefined) {
+        console.log(id);
+    }
+    var pointsBuffer = buffers.pointsBuffer;
+    var resultsBuffer = buffers.resultBuffer;
+    var stagingBuffer = device.createBuffer({
+        size: RESULT_BUFFER_SIZE,
+        usage: GPUBufferUsage.MAP_READ | GPUBufferUsage.COPY_DST,
+    });
+    
     device.queue.writeBuffer(isoBuffer, 0, new Float32Array([isoLevel]));
     device.queue.writeBuffer(lengthBuffer, 0, new Uint32Array([length]));
     device.queue.writeBuffer(widthBuffer, 0, new Uint32Array([width]));
     device.queue.writeBuffer(heightBuffer, 0, new Uint32Array([height]));
-    device.queue.writeBuffer(pointsBuffer, 0, pointsArrayBuffer);
 
     var bindGroup = device.createBindGroup({
         layout: bindGroupLayout,
@@ -217,7 +257,7 @@ export let marchingCubeGPU = async (
         if (isGood) count += 9;
     }
     temp = new Float32Array(temp2.slice(0, count));
-    console.log(temp);
+    //console.log(temp);
     for (var i = 0; i < temp.length; i += 3) {
         temp[i] -= length / 2;
         temp[i + 1] -= width / 2;
