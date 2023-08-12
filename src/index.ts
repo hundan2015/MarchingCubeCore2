@@ -13,6 +13,16 @@ let length = 50;
 let width = 50;
 let height = 50;
 
+const floatingLoading = document.getElementById("floating-tip");
+let onWaitingLoading = new Event("onWaitingLoading");
+let avokeLoading = new Event("avokeLoading");
+floatingLoading.addEventListener("onWaitingLoading", () => {
+    floatingLoading.style.display = "none";
+});
+floatingLoading.addEventListener("avokeLoading", () => {
+    floatingLoading.style.display = "block";
+});
+
 export let getNewModel = (
     isoLevel: number,
     slice: number,
@@ -20,6 +30,7 @@ export let getNewModel = (
     width: number,
     height: number
 ) => {
+    floatingLoading.dispatchEvent(avokeLoading);
     let start = new Date();
     let promises = [];
     let pointUnit = length * width * 4;
@@ -110,6 +121,7 @@ export let getNewModel = (
         console.log("Add end.");
         let end = new Date();
         console.log("Total time:" + String(end.getTime() - start.getTime()));
+        floatingLoading.dispatchEvent(onWaitingLoading);
         /* {
             const geometry = new THREE.BoxGeometry(1, 1, 1);
             //const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
@@ -128,12 +140,14 @@ export let getNewModel = (
 let isoSlider = document.getElementById("myRange") as HTMLInputElement;
 console.dir(isoSlider);
 isoSlider.onchange = () => {
+    floatingLoading.dispatchEvent(avokeLoading);
     let value = isoSlider.value;
     getNewModel(Number(value), 1, length, width, height);
 };
 
 let fileInput = document.getElementById("inputFile") as HTMLInputElement;
 fileInput.addEventListener("change", () => {
+    floatingLoading.dispatchEvent(avokeLoading);
     let tempFile = fileInput.files[0];
     console.log(tempFile);
     function loadFile(): Promise<ArrayBuffer> {
@@ -209,6 +223,11 @@ const camera = new THREE.PerspectiveCamera(
     1000
 );
 
+var gridHelper = new THREE.GridHelper(200, 25);
+gridHelper.position.y = -2.5;
+camera.position.y = -0.5;
+scene.add(gridHelper);
+
 console.log("Hi");
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth * 0.9, window.innerHeight * 0.9);
@@ -221,7 +240,7 @@ let cameraControls = new OrbitControls(camera, renderer.domElement);
 cameraControls.addEventListener("change", () => {
     renderer.render(scene, camera);
 });
-camera.position.z = 10;
+camera.position.z = 5;
 
 // load default model.
 POINTGPU.clearBufferContainer();

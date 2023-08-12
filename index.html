@@ -19,6 +19,18 @@
                 padding: 20px;
                 border: 1px solid #ccc;
                 box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+                z-index: 999;
+            }
+            #floating-tip {
+                display: none;
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background-color: #53748f;
+                padding: 20px;
+                border: 1px solid #ccc;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
                 z-index: 9999;
             }
         </style>
@@ -28,9 +40,9 @@
 
     <body>
         <div id="container">
-            
+            <div id="floating-tip">Loading...</div>
             <div id="floating-window">
-                <div class="col-1">
+                <div class="col-2">
                     <label for="width"> width</label
                     ><input type="number" id="width" />
                     <label for="length"> length</label
@@ -61,15 +73,28 @@
                     id="control-panal"
                     style="position: absolute; top: 3%; left: 3%"
                 >
-                    <label style="color: white"> ISO level </label>
-                    <input
-                        type="range"
-                        id="myRange"
-                        min="0"
-                        max="50"
-                        step="0.5"
-                    />
-                    <button id="show-floating-btn">File info</button>
+                    <div>
+                        <label style="color: white"> ISO level </label>
+                        <input
+                            type="range"
+                            id="myRange"
+                            min="0"
+                            max="50"
+                            step="0.5"
+                        />
+                        <button id="show-floating-btn">File info</button>
+                    </div>
+                    <div style="float: left">
+                        <div style="color: white; text-align: left">
+                            Left click to rotate.
+                        </div>
+                        <div style="color: white; text-align: left">
+                            Right click to move.
+                        </div>
+                        <div style="color: white; text-align: left">
+                            Wheel to scale.
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
