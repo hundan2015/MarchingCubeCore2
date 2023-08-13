@@ -16,3 +16,5 @@ npx vite
 ```
 
 Then view the page in the target url.
+
+The document of compute shader is in this [file](/document/readme.md).
