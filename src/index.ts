@@ -37,7 +37,7 @@ export let getNewModel = (
     let i = 0;
     for (let i = 0; i < pointsArray.length; i += pointUnit * slice) {
         var tempPromise = POINTGPU.marchingCubeGPU(
-            pointsArray.slice(i, i + pointUnit * (slice + 2)),
+            pointsArray.slice(i, i + pointUnit * (slice + 1)),
             length,
             width,
             slice,
